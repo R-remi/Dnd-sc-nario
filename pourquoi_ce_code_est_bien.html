@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Architecture de notre App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f0f0f0;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #00ffd5;
+        }
+
+        p.subtitle {
+            color: #aaa;
+            font-style: italic;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        h2 {
+            color: #00ffd5;
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            color: #00ff99;
+            font-family: Consolas, monospace;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Architecture & Design Patterns</h1>
+    <p class="subtitle">Comment notre app est pensée pour être propre, modulaire et scalable</p>
+</header>
+
+<section class="card">
+    <h2>🎯 Strategy Pattern</h2>
+    <pre>Classe abstraite PromptStrategy + deux implémentations
+(BeginnerPromptStrategy, ScenarioPromptStrategy) pour générer le prompt différemment selon le mode.</pre>
+</section>
+
+<section class="card">
+    <h2>🏭 Factory Pattern</h2>
+    <pre>Fonction createPromptStrategy(type) pour instancier dynamiquement la stratégie de prompt.</pre>
+</section>
+
+<section class="card">
+    <h2>🔐 Encapsulation (OOP)</h2>
+    <pre>Classe OllamaClient pour gérer proprement les appels à l’API Ollama.</pre>
+</section>
+
+<section class="card">
+    <h2>📦 Séparation des responsabilités</h2>
+    <pre>Le code est organisé selon les responsabilités :
+- UI (interface)
+- logique métier (stratégie)
+- communication réseau (client API)
+- gestion d’état (historique)</pre>
+</section>
+
+<footer>
+    Projet réalisé avec le ❤️ et des bons patrons.
+</footer>
+</body>
+</html>

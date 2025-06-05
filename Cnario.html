@@ -2,71 +2,105 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Ollama DnD</title>
+  <title>Donjons & Dragons - Narrateur IA</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
-    textarea, button { width: 100%; margin-top: 10px; font-size: 16px; }
+    textarea, select, button { width: 100%; margin-top: 10px; font-size: 16px; }
     #chat { margin-top: 20px; padding: 10px; background: #f0f0f0; white-space: pre-wrap; border: 1px solid #ccc; height: 300px; overflow-y: scroll; }
     .user { color: blue; font-weight: bold; }
     .llm { color: green; font-weight: bold; }
   </style>
 </head>
 <body>
-<h1>Donjons & Dragons - Chat Narratif</h1>
+<h1>Donjons & Dragons - Narrateur IA</h1>
+
+<label for="mode">Choisir un mode :</label>
+<select id="mode">
+  <option value="beginner">Débutant (scène unique)</option>
+  <option value="scenario">Scénario (pas à pas)</option>
+</select>
+
 <div id="chat"></div>
 <textarea id="prompt" rows="3" placeholder="Ex: Michel entre dans une taverne..."></textarea>
 <button onclick="sendPrompt()">Envoyer</button>
 
 <script>
+  // Strategy Interface
+  class PromptStrategy {
+    buildPrompt(history, userInput) {
+      throw new Error("Méthode non implémentée");
+    }
+  }
+
+  class BeginnerPromptStrategy extends PromptStrategy {
+    buildPrompt(_, userInput) {
+      return `Tu es un maître du jeu Donjons & Dragons. Tu parles français. Écris une scène complète avec :\n- Description du lieu\n- Personnages présents\n- Réactions à l’arrivée du joueur\n- Dialogues naturels\n- Enchaînement des événements\n\nUtilise un style narratif riche.\n\nSituation de départ : ${userInput}`;
+    }
+  }
+
+  class ScenarioPromptStrategy extends PromptStrategy {
+    buildPrompt(history, _) {
+      const base = `Tu es un maître du jeu Château & Créatures fantastiques. Tu parles français. Génére des scènes riches et crédibles sans questions ouvertes.`;
+      const historique = history.map(h =>
+              (h.role === 'user' ? "Joueur : " : "MJ : ") + h.content
+      ).join("\n");
+      return `${base}\n\nHistorique de la partie :\n${historique}\n\nContinue l’histoire :`;
+    }
+  }
+
+  function createPromptStrategy(type) {
+    if (type === "beginner") return new BeginnerPromptStrategy();
+    if (type === "scenario") return new ScenarioPromptStrategy();
+    throw new Error("Type de stratégie inconnu");
+  }
+
+  class OllamaClient {
+    constructor(model = "llama3") {
+      this.model = model;
+    }
+    async generate(promptText) {
+      const res = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: this.model, prompt: promptText, stream: false })
+      });
+      if (!res.ok) throw new Error("Erreur réseau : " + res.status);
+      const data = await res.json();
+      return data.response;
+    }
+  }
+
+  const history = [];
   const chatDiv = document.getElementById('chat');
   const promptInput = document.getElementById('prompt');
-
-  let history = [];
-
-  const basePrompt = `Tu es un maître du jeu Chateau & Créatures fantastiques. Tu parles français. Tu génères des scènes immersives, riches, crédibles et interactives. Ne pose pas de questions ouvertes, continue l’histoire de façon fluide, comme dans une vraie partie.`;
+  const ollama = new OllamaClient();
 
   function updateChat() {
-    chatDiv.innerHTML = history.map(item => {
-      if (item.role === 'user') return `<div class="user">👤 ${item.content}</div>`;
-      if (item.role === 'assistant') return `<div class="llm">🎲 ${item.content}</div>`;
-    }).join('\n');
+    chatDiv.innerHTML = history.map(item =>
+            `<div class="${item.role}">${item.role === 'user' ? '👤' : '🎲'} ${item.content}</div>`
+    ).join('\n');
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 
   async function sendPrompt() {
-    const userText = promptInput.value.trim();
-    if (!userText) return;
+    const userInput = promptInput.value.trim();
+    if (!userInput) return;
 
-    history.push({ role: 'user', content: userText });
-    updateChat();
+    const mode = document.getElementById('mode').value;
+    const strategy = createPromptStrategy(mode);
+
+    if (mode === "scenario") history.push({ role: 'user', content: userInput });
+
+    const prompt = strategy.buildPrompt(history, userInput);
     promptInput.value = "";
-
-    const promptFull = basePrompt + "\n\nHistorique de la partie :\n" +
-            history.map(h => (h.role === 'user' ? "Joueur : " : "MJ : ") + h.content).join("\n") +
-            "\n\nContinue l’histoire :";
+    updateChat();
 
     try {
-      const res = await fetch('http://localhost:11434/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'llama3',
-          prompt: promptFull,
-          stream: false
-        })
-      });
-
-      if (!res.ok) {
-        history.push({ role: 'assistant', content: "❌ Erreur : " + res.status });
-        updateChat();
-        return;
-      }
-
-      const data = await res.json();
-      history.push({ role: 'assistant', content: data.response });
+      const response = await ollama.generate(prompt);
+      history.push({ role: 'assistant', content: response });
       updateChat();
     } catch (err) {
-      history.push({ role: 'assistant', content: "❌ Erreur de connexion à l'API Ollama." });
+      history.push({ role: 'assistant', content: "❌ Erreur : " + err.message });
       updateChat();
       console.error(err);
     }
