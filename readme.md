@@ -91,9 +91,7 @@ Projet libre et open-source — utilise Ollama et les modèles open LLaMA.
 
 Souhaites-tu que je t’aide à générer une **version anglaise** du `README.md` aussi ?
 
-Vous avez dit :
-met tout le readme
-ChatGPT a dit :
+
 
 Voici ton README.md complet, prêt à être utilisé :
 
@@ -138,19 +136,19 @@ Cela téléchargera (si nécessaire) le modèle llama3 et le démarrera automati
 Le serveur local sera accessible à l’adresse : http://localhost:11434.
 3. Lancer l'interface web
 
-    Place le fichier index.html dans un dossier (ex. ollama-chat).
+Place le fichier index.html dans un dossier (ex. ollama-chat).
 
-    Ouvre un terminal dans ce dossier.
+Ouvre un terminal dans ce dossier.
 
-    Lance un serveur web local avec Python :
+Lance un serveur web local avec Python :
 
-python3 -m http.server
+    python3 -m http.server
 
-    Ouvre ton navigateur à l'adresse suivante :
+Ouvre ton navigateur à l'adresse suivante :
 
-http://localhost:8000
+    http://localhost:8000
 
-    Tu peux maintenant poser des questions au modèle depuis l'interface web.
+Tu peux maintenant poser des questions au modèle depuis l'interface web.
 
 📁 Arborescence du projet
 
@@ -160,23 +158,23 @@ http://localhost:8000
 
 ❗ Problèmes connus
 
-    CORS : Si tu ouvres index.html directement (file://), les requêtes seront bloquées pour des raisons de sécurité.
-    → Utilise impérativement python3 -m http.server.
+CORS : Si tu ouvres index.html directement (file://), les requêtes seront bloquées pour des raisons de sécurité.
+→ Utilise impérativement python3 -m http.server.
 
-    Port utilisé : Le port 11434 doit être libre et ne pas être bloqué par un pare-feu.
+Port utilisé : Le port 11434 doit être libre et ne pas être bloqué par un pare-feu.
 
-    Modèle non lancé : Assure-toi que ollama run llama3 est en cours avant d’ouvrir la page web.
+Modèle non lancé : Assure-toi que ollama run llama3 est en cours avant d’ouvrir la page web.
 
 ✅ Exemple de fonctionnement
 
-    Entrer une question dans le champ texte, par exemple :
+Entrer une question dans le champ texte, par exemple :
 
-        Pourquoi le ciel est-il bleu ?
+    Pourquoi le ciel est-il bleu ?
 
-    Cliquer sur Envoyer
+Cliquer sur Envoyer
 
-    Le modèle LLaMA 3 répond directement sous le champ texte.
+Le modèle LLaMA 3 répond directement sous le champ texte.
 
 📄 Licence
 
-Projet personnel — utilise Ollama et les modèles open-source comme LLaMA 3.
+Projet Rémi + Noé — utilise Ollama et les modèles open-source comme LLaMA 3.
