@@ -30,7 +30,10 @@
 
   <script>
     async function sendPrompt() {
-      const promptText = document.getElementById('prompt').value;
+
+      const prePrompt = " ";
+      const promptText = prePrompt + document.getElementById('prompt').value.trim();
+
       const responseDiv = document.getElementById('response');
       responseDiv.textContent = "Chargement...";
 
