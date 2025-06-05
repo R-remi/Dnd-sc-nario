@@ -38,6 +38,8 @@ Dans un terminal, exécute la commande suivante :
 ```bash
 ollama run llama3
 
+```
+
 Cela téléchargera (si nécessaire) le modèle llama3 et le démarrera automatiquement.
 Le serveur local sera accessible à l’adresse : http://localhost:11434.
 
@@ -131,7 +133,7 @@ Dans un terminal, exécute la commande suivante :
 
 ```bash
 ollama run llama3
-
+```
 Cela téléchargera (si nécessaire) le modèle llama3 et le démarrera automatiquement.
 Le serveur local sera accessible à l’adresse : http://localhost:11434.
 3. Lancer l'interface web
