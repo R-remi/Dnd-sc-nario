@@ -9,6 +9,8 @@
     #chat { margin-top: 20px; padding: 10px; background: #f0f0f0; white-space: pre-wrap; border: 1px solid #ccc; height: 300px; overflow-y: scroll; }
     .user { color: blue; font-weight: bold; }
     .llm { color: green; font-weight: bold; }
+    .choice-buttons { display: flex; gap: 10px; margin-top: 10px; }
+    .choice-buttons button { flex: 1; }
   </style>
 </head>
 <body>
@@ -22,6 +24,11 @@
 
 <div id="chat"></div>
 <textarea id="prompt" rows="3" placeholder="Ex: Michel entre dans une taverne..."></textarea>
+<div class="choice-buttons">
+  <button onclick="sendPromptWithChoice('solution 1, ')">Choisir la solution 1</button>
+  <button onclick="sendPromptWithChoice('solution 2, ')">Choisir la solution 2</button>
+  <button onclick="sendPromptWithChoice('solution 3, ')">Choisir la solution 3</button>
+</div>
 <button onclick="sendPrompt()">Envoyer</button>
 
 <script>
@@ -40,24 +47,19 @@
 
   class ScenarioPromptStrategy extends PromptStrategy {
     buildPrompt(history, _) {
-
-
-
       const base = `Tu es le système narratif du jeu Château & Créatures fantastiques. Tu aides exclusivement le maître du jeu (MJ) en générant des scènes riches, crédibles et immersives. Tu ne t’adresses jamais aux joueurs, seulement au MJ.
 
-Tu ne décris jamais les dialogues ou actions des joueurs. Tu invites le MJ à indiquer ce que les joueurs font ou disent, puis tu réagis en conséquence.
+              Tu ne décris jamais les dialogues ou actions des joueurs. Tu invites le MJ à indiquer ce que les joueurs font ou disent, puis tu réagis en conséquence.
 
-Quand cela est pertinent (par exemple pour un PNJ, une réaction ou un environnement), tu peux proposer plusieurs options, **mais une seule fois par réponse**. Structure ces propositions ainsi :
-- **Solution 1 :** ...
-- **Solution 2 :** ...
-- **Solution 3 :** ...
+              Quand cela est pertinent (par exemple pour un PNJ, une réaction ou un environnement), tu peux proposer plusieurs options, **mais une seule fois par réponse**. Structure ces propositions ainsi :
+              - **Solution 1 :** ...
+              - **Solution 2 :** ...
+              - **Solution 3 :** ...
 
-Tu ne poses pas de questions ouvertes. Tu proposes, tu suggères, tu enrichis l’histoire, toujours en français, pour faciliter le travail du MJ sans jamais le remplacer.`;
-
-
+              Tu ne poses pas de questions ouvertes. Tu proposes, tu suggères, tu enrichis l’histoire, toujours en français, pour faciliter le travail du MJ sans jamais le remplacer.`;
 
       const historique = history.map(h =>
-              (h.role === 'user' ? "Joueur : " : "MJ : ") + h.content
+        (h.role === 'user' ? "Joueur : " : "MJ : ") + h.content
       ).join("\n");
       return `${base}\n\nHistorique de la partie :\n${historique}\n\nContinue l’histoire :`;
     }
@@ -92,24 +94,30 @@ Tu ne poses pas de questions ouvertes. Tu proposes, tu suggères, tu enrichis l�
 
   function updateChat() {
     chatDiv.innerHTML = history.map(item =>
-            `<div class="${item.role}">${item.role === 'user' ? '👤' : '🎲'} ${item.content}</div>`
+      `<div class="${item.role}">${item.role === 'user' ? '👤' : '🎲'} ${item.content}</div>`
     ).join('\n');
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 
-  async function sendPrompt() {
-    const userInput = promptInput.value.trim();
-    if (!userInput) return;
+  async function sendPrompt(extraPrefix = '') {
+    const rawInput = promptInput.value.trim();
+    if (!rawInput) return;
+
+    const userVisibleMessage = rawInput;
+    const hiddenMessage = extraPrefix + rawInput;
 
     const mode = document.getElementById('mode').value;
     const strategy = createPromptStrategy(mode);
 
-    if (mode === "scenario") history.push({ role: 'user', content: userInput });
+    if (mode === "scenario") {
+      // Affiche le message original dans le chat, pas le préfixé
+      history.push({ role: 'user', content: userVisibleMessage });
+    }
 
-    const prompt = strategy.buildPrompt(history, userInput);
+    const prompt = strategy.buildPrompt(history, hiddenMessage);
+    console.log('Prompt envoyé :', prompt); // Log the prompt for debugging
     promptInput.value = "";
     updateChat();
-
     try {
       const response = await ollama.generate(prompt);
       history.push({ role: 'assistant', content: response });
@@ -120,6 +128,18 @@ Tu ne poses pas de questions ouvertes. Tu proposes, tu suggères, tu enrichis l�
       console.error(err);
     }
   }
+
+  function sendPromptWithChoice(prefix) {
+    sendPrompt(prefix);
+  }
+
+  // Add event listener for "Enter" key press
+  promptInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent new line
+      sendPrompt(); // Trigger the sendPrompt function
+    }
+  });
 </script>
 </body>
 </html>
