@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+textarea, select, button {
+    width: 100%;
+    margin-top: 10px;
+    font-size: 16px;
+}
+#chat {
+    margin-top: 20px;
+    padding: 10px;
+    background: #f0f0f0;
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+    height: 300px;
+    overflow-y: scroll;
+}
+.user {
+    color: blue;
+    font-weight: bold;
+}
+.llm {
+    color: green;
+    font-weight: bold;
+}
+.choice-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.choice-buttons button {
+    flex: 1;
+}
+#summaryButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
