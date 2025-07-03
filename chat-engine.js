@@ -1,11 +1,10 @@
-// Strategy interface
+
 class PromptStrategy {
     buildPrompt(history, userInput) {
         throw new Error("Méthode non implémentée");
     }
 }
 
-// Débutant : scène unique
 class BeginnerPromptStrategy extends PromptStrategy {
     buildPrompt(_, userInput) {
         return `Tu es un maître du jeu Donjons & Dragons. Tu parles français. Écris une scène complète avec :
@@ -21,7 +20,6 @@ Situation de départ : ${userInput}`;
     }
 }
 
-// Avancé : avec historique
 class ScenarioPromptStrategy extends PromptStrategy {
     buildPrompt(history, _) {
         const base = `Tu es un maître du jeu Château & Créatures fantastiques. Tu parles français. Génére des scènes riches et crédibles sans questions ouvertes.`;
@@ -34,14 +32,12 @@ class ScenarioPromptStrategy extends PromptStrategy {
     }
 }
 
-// Factory
 function createPromptStrategy(type) {
     if (type === "beginner") return new BeginnerPromptStrategy();
     if (type === "scenario") return new ScenarioPromptStrategy();
     throw new Error("Type inconnu");
 }
 
-// Facade : client API
 class OllamaClient {
     constructor(model = "llama3") {
         this.model = model;

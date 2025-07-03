@@ -12,6 +12,7 @@
     .choice-buttons { display: flex; gap: 10px; margin-top: 10px; }
     .choice-buttons button { flex: 1; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 </head>
 <body>
 <h1>Donjons & Dragons - Narrateur IA</h1>
@@ -31,8 +32,10 @@
 </div>
 <button onclick="sendPrompt()">Envoyer</button>
 
+<button id="summaryButton" style="position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; font-size: 16px;">Résumé</button>
+
 <script>
-  // Strategy Interface
+
   class PromptStrategy {
     buildPrompt(history, userInput) {
       throw new Error("Méthode non implémentée");
@@ -100,45 +103,92 @@
   }
 
   async function sendPrompt(extraPrefix = '') {
-    const rawInput = promptInput.value.trim();
-    if (!rawInput) return;
+  const rawInput = promptInput.value.trim();
+  if (!rawInput) return;
 
-    const userVisibleMessage = rawInput;
-    const hiddenMessage = extraPrefix + rawInput;
+  const userVisibleMessage = rawInput;
+  const hiddenMessage = extraPrefix + rawInput;
 
-    const mode = document.getElementById('mode').value;
-    const strategy = createPromptStrategy(mode);
+  const mode = document.getElementById('mode').value;
+  const strategy = createPromptStrategy(mode);
 
-    if (mode === "scenario") {
-      // Affiche le message original dans le chat, pas le préfixé
-      history.push({ role: 'user', content: userVisibleMessage });
-    }
+  if (mode === "scenario") {
+    history.push({ role: 'user', content: hiddenMessage });
+  } else {
+    history.push({ role: 'user', content: userVisibleMessage });
+  }
 
-    const prompt = strategy.buildPrompt(history, hiddenMessage);
-    console.log('Prompt envoyé :', prompt); // Log the prompt for debugging
-    promptInput.value = "";
+  const prompt = strategy.buildPrompt(history, hiddenMessage);
+  console.log('Prompt envoyé :', prompt);
+  promptInput.value = "";
+  updateChat();
+  try {
+    const response = await ollama.generate(prompt);
+    history.push({ role: 'assistant', content: response });
     updateChat();
-    try {
-      const response = await ollama.generate(prompt);
-      history.push({ role: 'assistant', content: response });
-      updateChat();
-    } catch (err) {
-      history.push({ role: 'assistant', content: "❌ Erreur : " + err.message });
-      updateChat();
-      console.error(err);
-    }
+  } catch (err) {
+    history.push({ role: 'assistant', content: "❌ Erreur : " + err.message });
+    updateChat();
+    console.error(err);
   }
+}
 
-  function sendPromptWithChoice(prefix) {
-    sendPrompt(prefix);
-  }
+function sendPromptWithChoice(prefix) {
+  sendPrompt(prefix);
+}
 
   promptInput.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Prevent new line
-      sendPrompt(); // Trigger the sendPrompt function
+      event.preventDefault();
+      sendPrompt();
     }
   });
+
+
+  async function sendSummaryRequest() {
+  const summaryPrompt = `Résumé de la session :\n\n${history.map(h =>
+          (h.role === 'user' ? "Joueur : " : "MJ : ") + h.content
+  ).join("\n")}\n\nFais un résumé clair et concis de cette session.`;
+
+  try {
+    const response = await ollama.generate(summaryPrompt);
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    const maxWidth = pageWidth - margin * 2;
+    const lineHeight = 10;
+    let y = 20;
+
+    doc.text("Résumé de la session :", margin, y);
+    y += lineHeight;
+
+
+    const lines = doc.splitTextToSize(response, maxWidth);
+    lines.forEach(line => {
+      if (y + lineHeight > doc.internal.pageSize.getHeight() - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(line, margin, y);
+      y += lineHeight;
+    });
+
+    doc.save("resume_session.pdf");
+  } catch (err) {
+    console.error("Erreur lors de la génération du résumé :", err);
+  }
+}
+
+
+  document.getElementById('summaryButton').addEventListener('click', sendSummaryRequest);
+
+
+
+
 </script>
+
 </body>
 </html>
