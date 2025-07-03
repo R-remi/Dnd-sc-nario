@@ -1,10 +1,10 @@
-# 🧠 Ollama Chat Web Interface
+# Ollama Chat Web Interface
 
 Une interface web simple pour discuter avec un modèle LLaMA 3 local grâce à [Ollama](https://ollama.com/).
 
 ---
 
-## ⚙️ Prérequis
+##  Prérequis
 
 - [Ollama](https://ollama.com/) installé et configuré
 - Modèle `llama3` téléchargé localement
@@ -12,7 +12,7 @@ Une interface web simple pour discuter avec un modèle LLaMA 3 local grâce à [
 
 ---
 
-## 🛠️ Installation
+##  Installation
 
 ### 1. Installer Ollama
 
@@ -53,13 +53,13 @@ Ouvre ton navigateur à l'adresse suivante :
 
 Tu peux maintenant poser des questions au modèle depuis l'interface web.
 
-📁 Arborescence du projet
+ Arborescence du projet
 
 /ollama-chat/
 ├── index.html      # Page web avec champ texte et réponse du modèle
 └── README.md       # Ce fichier
 
-❗ Problèmes connus
+ Problèmes connus
 
 CORS : Si tu ouvres index.html directement (file://), les requêtes seront bloquées pour des raisons de sécurité.
 → Utilise impérativement python3 -m http.server.
@@ -68,7 +68,7 @@ Port utilisé : Le port 11434 doit être libre et ne pas être bloqué par un pa
 
 Modèle non lancé : Assure-toi que ollama run llama3 est en cours avant d’ouvrir la page web.
 
-✅ Exemple de fonctionnement
+ Exemple de fonctionnement
 
 Entrer une question dans le champ texte, par exemple :
 
@@ -78,6 +78,6 @@ Cliquer sur Envoyer
 
 Le modèle LLaMA 3 répond directement sous le champ texte.
 
-📄 Licence
+ Licence
 
 Projet Rémi + Noé — utilise Ollama et les modèles open-source comme LLaMA 3.
