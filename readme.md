@@ -4,7 +4,7 @@ Une interface web simple pour discuter avec un modèle LLaMA 3 local grâce à [
 
 ---
 
-## ⚙ Prérequis
+##  Prérequis
 
 - [Ollama](https://ollama.com/) installé et configuré
 - Modèle `llama3` téléchargé localement
@@ -12,7 +12,7 @@ Une interface web simple pour discuter avec un modèle LLaMA 3 local grâce à [
 
 ---
 
-## 🛠 Installation
+##  Installation
 
 ### 1. Installer Ollama
 
